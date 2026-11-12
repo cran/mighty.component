@@ -1,0 +1,37 @@
+Package: mighty.component
+Title: Mighty Components for ADaM Generation
+Version: 0.2.0
+Authors@R: c(
+    person("Aksel", "Thomsen", , "oath@novonordisk.com", role = c("aut", "cre")),
+    person("Matthew", "Phelps", , "mewp@novonordisk.com", role = "aut"),
+    person("Novo Nordisk A/S", role = "cph")
+  )
+Description: Reusable code templates (components) for the 'mighty'
+    framework, used to generate Analysis Data Model (ADaM) programs.
+    Components are 'Mustache' templates documented with 'roxygen2'-like
+    tags. They can be retrieved from local directories, 'GitHub' or
+    URLs, rendered with study-specific parameters, validated,
+    evaluated, and unit tested with code coverage.
+License: Apache License (>= 2)
+URL: https://novonordisk-opensource.github.io/mighty.component/,
+        https://github.com/NovoNordisk-OpenSource/mighty.component
+BugReports: https://github.com/NovoNordisk-OpenSource/mighty.component/issues
+Depends: R (>= 4.1)
+Imports: cli, glue, R6 (>= 2.4.0), rlang, S7, whisker, withr (>=
+        2.5.0), xml2, xmlparsedata, zephyr
+Suggests: admiral, callr, covr, curl, dplyr, gh, httr2, knitr,
+        pharmaverseadam, remotes, rmarkdown, testthat (>= 3.2.0),
+        tibble, tidyr
+VignetteBuilder: knitr
+Config/roxygen2/version: 8.1.0
+Config/testthat/edition: 3
+Encoding: UTF-8
+Language: en-US
+NeedsCompilation: no
+Packaged: 2026-10-27 09:33:32 UTC; oath
+Author: Aksel Thomsen [aut, cre],
+  Matthew Phelps [aut],
+  Novo Nordisk A/S [cph]
+Maintainer: Aksel Thomsen <oath@novonordisk.com>
+Repository: CRAN
+Date/Publication: 2026-11-12 11:00:02 UTC

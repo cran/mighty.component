@@ -1,0 +1,205 @@
+skip_if_not_installed("callr")
+skip_if_not_installed("covr")
+
+test_that("general testing workflow", {
+  skip_if_not_installed("admiral")
+  skip_if_not_installed("dplyr")
+  skip_if_not_installed("pharmaverseadam")
+
+  x <- get_test_component(
+    component = test_path("_components", "ady_local.mustache"),
+    params = list(domain = "adlb", variable = "ADY2", date = "ADT")
+  )
+  withr::defer(x$close())
+
+  x$assign("adlb", head(pharmaverseadam::adlb, 5)) |>
+    expect_invisible()
+
+  x$ls() |>
+    expect_visible() |>
+    expect_equal("adlb")
+
+  x$get("adlb") |>
+    names() |>
+    intersect("ADY2") |>
+    expect_length(0)
+
+  x$percent_coverage |>
+    expect_equal(0)
+
+  x$eval() |>
+    expect_invisible()
+
+  x$get("adlb") |>
+    expect_visible() |>
+    names() |>
+    expect_contains("ADY2")
+
+  x$percent_coverage |>
+    expect_equal(100)
+
+  x$line_coverage |>
+    expect_s3_class("data.frame") |>
+    names() |>
+    expect_equal(c("line", "value"))
+
+  x$check_coverage() |>
+    expect_no_error()
+
+  x$line_coverage$value |>
+    min() |>
+    expect_equal(1)
+})
+
+test_that("printing and test percentage updates", {
+  x <- get_test_component(
+    component = test_path("_components", "test_coverage.mustache"),
+    params = list(value = 5),
+    check_coverage = FALSE
+  )
+  withr::defer(x$close())
+
+  x$percent_coverage |>
+    expect_equal(0)
+
+  print(x) |>
+    expect_snapshot()
+
+  x$assign("limit", 10)$eval()$get("x") |>
+    expect_equal(5)
+
+  x$percent_coverage |>
+    expect_gt(0) |>
+    expect_lt(100)
+
+  print(x) |>
+    expect_snapshot()
+
+  x$assign("limit", 3)$eval()$get("x") |>
+    expect_equal(3)
+
+  x$percent_coverage |>
+    expect_equal(100)
+
+  print(x) |>
+    expect_snapshot()
+
+  x$line_coverage |>
+    expect_equal(
+      data.frame(
+        line = c(1, 3, 4),
+        value = c(2, 2, 1)
+      )
+    )
+})
+
+test_that("assigning .test_fn does not affect evaluation", {
+  x <- get_test_component(
+    component = test_path("_components", "test_coverage.mustache"),
+    params = list(value = 5),
+    check_coverage = FALSE
+  )
+  withr::defer(x$close())
+
+  x$assign(".test_fn", 2)$assign("limit", 3)$eval()$get("x") |>
+    expect_equal(3)
+})
+
+test_that("Error with no test code coverage", {
+  local({
+    x <- get_test_component(
+      component = test_path("_components", "test_component.mustache"),
+      params = list(domain = "a", x1 = 1, x2 = 3)
+    )
+    withr::defer(x$close())
+  }) |>
+    expect_error("All lines in component must be covered by unit tests")
+})
+
+test_that("Session closed on finalize", {
+  x <- get_test_component(
+    component = test_path("_components", "test_component.mustache"),
+    params = list(domain = "a", x1 = 1, x2 = 3),
+    check_coverage = FALSE
+  )
+
+  session <- x[[".__enclos_env__"]][["private"]][[".session"]]
+
+  session$is_alive() |>
+    expect_true()
+
+  rm(x)
+  gc() # Garbage collection enforced finalize on deleted objects
+
+  session$is_alive() |>
+    expect_false()
+})
+
+test_that("close() closes the session", {
+  x <- get_test_component(
+    component = test_path("_components", "test_coverage.mustache"),
+    params = list(value = 5),
+    check_coverage = FALSE
+  )
+
+  session <- x[[".__enclos_env__"]][["private"]][[".session"]]
+
+  session$is_alive() |>
+    expect_true()
+
+  x$close() |>
+    expect_invisible() |>
+    expect_identical(x)
+
+  session$is_alive() |>
+    expect_false()
+
+  x$close() |>
+    expect_no_error()
+
+  print(x) |>
+    expect_snapshot()
+
+  x$eval() |>
+    expect_error("The test session is closed")
+  x$assign("limit", 10) |>
+    expect_error("The test session is closed")
+  x$get("x") |>
+    expect_error("The test session is closed")
+  x$ls() |>
+    expect_error("The test session is closed")
+  expect_snapshot(x$ls(), error = TRUE)
+})
+
+test_that("coverage can be checked after close()", {
+  x <- get_test_component(
+    component = test_path("_components", "test_coverage.mustache"),
+    params = list(value = 5),
+    check_coverage = FALSE
+  )
+
+  x$assign("limit", 10)$eval()$assign("limit", 3)$eval()$close()
+
+  x$percent_coverage |>
+    expect_equal(100)
+
+  x$check_coverage() |>
+    expect_no_error()
+})
+
+test_that("finalize after close() does not error", {
+  x <- get_test_component(
+    component = test_path("_components", "test_component.mustache"),
+    params = list(domain = "a", x1 = 1, x2 = 3),
+    check_coverage = FALSE
+  )
+
+  x$close()
+
+  x[[".__enclos_env__"]][["private"]]$finalize() |>
+    expect_no_error()
+
+  rm(x)
+  gc() |>
+    expect_no_error()
+})

@@ -1,0 +1,68 @@
+expect_ady <- function(x) {
+  expect_s3_class(x, "mighty_component_rendered")
+  expect_equal(x$type, "column")
+  expect_equal(
+    x$depends,
+    data.frame(domain = rep("domain", 2), column = c("date_var", "TRTSDT"))
+  )
+  expect_equal(x$outputs, "out_var")
+
+  invisible(x)
+}
+
+test_that("get_rendered_component, custom code component from R script", {
+  x <- get_rendered_component(
+    component = test_path("_components", "ady_local.R")
+  )
+
+  expect_ady(x)
+  expect_snapshot(x)
+})
+
+
+test_that("get_rendered_component custom local mustache template with params", {
+  x <- get_rendered_component(
+    component = test_path("_components", "ady_local.mustache"),
+    params = list(
+      domain = "domain",
+      date = "date_var",
+      variable = "out_var"
+    )
+  )
+
+  expect_ady(x)
+  expect_snapshot(x)
+})
+
+
+test_that("error handling", {
+  get_component("my/fake/file.mustache") |>
+    expect_error("does not exist")
+
+  get_rendered_component("my/other/fake/file.mustache", list()) |>
+    expect_error("does not exist")
+})
+
+test_that("Error when any parameter insufficiently parameterized", {
+  template <- c(
+    "#' @title Mistake in parameters",
+    "#' @description This is a test component with missing parameters.",
+    "#' @param variable",
+    "#' @param date ",
+    "#' @type column",
+    "#' @origin Derived",
+    "#' @method Test placeholder method",
+    "#' @depends {{{domain}}} {{{date}}}",
+    "#' @depends {{{domain}}} TRTSDT",
+    "#' @outputs {{{variable}}}",
+    "print('hello')"
+  )
+
+  expect_error(
+    object = mighty.component::mighty_component$new(
+      template = template,
+      id = "test_error"
+    ),
+    regexp = "Missing description for `variable` and `date`"
+  )
+})

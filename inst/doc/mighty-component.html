@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>Getting Started with mighty.component</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Getting Started with mighty.component</h1>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">library</span>(mighty.component)</span></code></pre></div>
+<div id="what-is-a-component" class="section level2">
+<h2>What is a component?</h2>
+<p>A component is a reusable code template for one data transformation
+step. Its code takes an input data set and returns it with new or
+changed columns or rows. Mustache placeholders, such as
+<code>{{{domain}}}</code>, are filled in when the component is rendered,
+so the same template works across studies. Roxygen-like tags, such as
+<code>@title</code>, <code>@param</code> and <code>@depends</code>,
+document what the component does, needs and creates.</p>
+<p>Components are commonly used to build ADaM (Analysis Data Model)
+programs. Each component handles one derivation, and several components
+make up a program. In the mighty ecosystem, mighty.metadata provides
+study configuration (via <a href="https://novonordisk-opensource.github.io/mighty.metadata/reference/mighty_study.html"><code>mighty_study()</code></a>
+and <code>_study.yml</code>) that controls which components are rendered
+and with which parameters.</p>
+</div>
+<div id="anatomy-of-a-component-template" class="section level2">
+<h2>Anatomy of a component template</h2>
+<p>Below is a minimal component that creates a column as two times an
+existing column:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co">#&#39; @title Double a column</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a><span class="co">#&#39; @description</span></span>
+<span id="cb2-3"><a href="#cb2-3" tabindex="-1"></a><span class="co">#&#39; Creates a new column as two times an existing column.</span></span>
+<span id="cb2-4"><a href="#cb2-4" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb2-5"><a href="#cb2-5" tabindex="-1"></a><span class="co">#&#39; @param domain `character` Name of the domain</span></span>
+<span id="cb2-6"><a href="#cb2-6" tabindex="-1"></a><span class="co">#&#39; @param output `character` Name of the new column</span></span>
+<span id="cb2-7"><a href="#cb2-7" tabindex="-1"></a><span class="co">#&#39; @param input `character` Name of the existing column</span></span>
+<span id="cb2-8"><a href="#cb2-8" tabindex="-1"></a><span class="co">#&#39; @type column</span></span>
+<span id="cb2-9"><a href="#cb2-9" tabindex="-1"></a><span class="co">#&#39; @origin Derived</span></span>
+<span id="cb2-10"><a href="#cb2-10" tabindex="-1"></a><span class="co">#&#39; @method Two times the input column</span></span>
+<span id="cb2-11"><a href="#cb2-11" tabindex="-1"></a><span class="co">#&#39; @depends </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> </span><span class="re">{{{</span><span class="co">input</span><span class="re">}}}</span></span>
+<span id="cb2-12"><a href="#cb2-12" tabindex="-1"></a><span class="co">#&#39; @outputs </span><span class="re">{{{</span><span class="co">output</span><span class="re">}}}</span></span>
+<span id="cb2-13"><a href="#cb2-13" tabindex="-1"></a><span class="co">#&#39; @code</span></span>
+<span id="cb2-14"><a href="#cb2-14" tabindex="-1"></a>{{{domain}}} <span class="ot">&lt;-</span> {{{domain}}} <span class="sc">|&gt;</span></span>
+<span id="cb2-15"><a href="#cb2-15" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb2-16"><a href="#cb2-16" tabindex="-1"></a>    {{{output}}} <span class="ot">=</span> <span class="dv">2</span> <span class="sc">*</span> {{{input}}}</span>
+<span id="cb2-17"><a href="#cb2-17" tabindex="-1"></a>  )</span></code></pre></div>
+<p>The template syntax is described below.</p>
+<div id="templates" class="section level3">
+<h3>Templates</h3>
+<p>A template starts with tags in roxygen comments (<code>#&#39;</code>).
+All lines below the <code>@code</code> tag are the R code.</p>
+<p>Templates use <a href="https://mustache.github.io/mustache.5.html">Mustache</a>
+placeholders. <code>$render()</code> fills them in with
+<code>whisker::whisker.render()</code>.</p>
+<ul>
+<li><code>{{{name}}}</code> inserts the value of parameter
+<code>name</code>. Always use triple braces. Double braces
+(<code>{{name}}</code>) HTML-escape the value, e.g. <code>a&lt;b</code>
+becomes <code>a&amp;lt;b</code>.</li>
+<li><code>{{#name}}...{{/name}}</code> repeats the enclosed text for
+each element of the vector <code>name</code>. Use <code>{{{.}}}</code>
+to insert the current element.</li>
+</ul>
+</div>
+<div id="tags" class="section level3">
+<h3>Tags</h3>
+<p>A tag continues until the next tag. Required tags must appear exactly
+once.</p>
+<table>
+<colgroup>
+<col width="13%" />
+<col width="8%" />
+<col width="37%" />
+<col width="41%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tag</th>
+<th>Required</th>
+<th>Description</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>@title</code></td>
+<td>Yes</td>
+<td>Title of the component.</td>
+<td><code>@title Double a column</code></td>
+</tr>
+<tr class="even">
+<td><code>@description</code></td>
+<td>Yes</td>
+<td>Description of the component.</td>
+<td><code>@description Creates a new column.</code></td>
+</tr>
+<tr class="odd">
+<td><code>@param</code></td>
+<td>No</td>
+<td>Name, then description. One per placeholder.</td>
+<td><code>@param domain `character` Name of the domain</code></td>
+</tr>
+<tr class="even">
+<td><code>@type</code></td>
+<td>Yes</td>
+<td>Component type. See <em>Types</em> below.</td>
+<td><code>@type column</code></td>
+</tr>
+<tr class="odd">
+<td><code>@origin</code></td>
+<td>Yes</td>
+<td>CDISC origin. See allowed values below.</td>
+<td><code>@origin Derived</code></td>
+</tr>
+<tr class="even">
+<td><code>@method</code></td>
+<td>Yes</td>
+<td>Free-text method description for define.xml.</td>
+<td><code>@method Two times the input column</code></td>
+</tr>
+<tr class="odd">
+<td><code>@depends</code></td>
+<td>No</td>
+<td>Input domain, then column. Repeat for each.</td>
+<td><code>@depends {{{domain}}} USUBJID</code></td>
+</tr>
+<tr class="even">
+<td><code>@outputs</code></td>
+<td>No</td>
+<td>Column created. Repeat for each.</td>
+<td><code>@outputs {{{output}}}</code></td>
+</tr>
+<tr class="odd">
+<td><code>@code</code></td>
+<td>Yes</td>
+<td>Last tag. All lines below are the code.</td>
+<td><code>@code</code></td>
+</tr>
+</tbody>
+</table>
+<p><code>@origin</code> must be one of <code>Assigned</code>,
+<code>Collected</code>, <code>Derived</code>,
+<code>Not Available</code>, <code>Other</code>,
+<code>Predecessor</code>, <code>Protocol</code>.</p>
+<p><code>@depends</code> is split at the first space into domain and
+column. Do not use spaces inside its placeholders, e.g. use
+<code>{{{domain}}}</code>, not <code>{{{ domain }}}</code>.</p>
+</div>
+<div id="types" class="section level3">
+<h3>Types</h3>
+<ul>
+<li><code>column</code>: Adds or modifies columns. The row count is
+unchanged.</li>
+<li><code>row</code>: Adds, removes or modifies rows.</li>
+<li><code>parameter</code>: Derives a new <code>PARAMCD</code> (BDS
+parameter).</li>
+<li><code>internal</code>: Helper step with no define.xml output.</li>
+</ul>
+</div>
+<div id="conventions" class="section level3">
+<h3>Conventions</h3>
+<ol style="list-style-type: decimal">
+<li>The input data set is <code>{{{domain}}}</code>.</li>
+<li>The code assigns the result back to <code>{{{domain}}}</code>.</li>
+<li>Every placeholder is declared with <code>@param</code>.</li>
+<li>Functions are called with explicit namespaces,
+e.g. <code>dplyr::mutate()</code>.</li>
+<li>Joins specify <code>by</code>. This is enforced when rendering.</li>
+</ol>
+<p>See <code>?mighty_component</code> for validation rules and a
+rendered example.</p>
+</div>
+</div>
+<div id="retrieve-and-inspect-a-component" class="section level2">
+<h2>Retrieve and inspect a component</h2>
+<p>List the example components shipped with the package:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a>path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;examples&quot;</span>, <span class="at">package =</span> <span class="st">&quot;mighty.component&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a><span class="fu">list_components</span>(path)</span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ady&quot;</span></span></code></pre></div>
+<p>Retrieve one by file path:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>ady <span class="ot">&lt;-</span> <span class="fu">get_component</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="fu">system.file</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;ady.mustache&quot;</span>, <span class="at">package =</span> <span class="st">&quot;mighty.component&quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>)</span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>ady</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component/R6&gt;</span></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="co">#&gt; ady: Analysis relative day</span></span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt; Type: column</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt; Parameters:</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; • domain: `character` Name of new domain being created</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt; • variable: `character` Name of new variable to create</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt; • date: `character` Name of date variable to use</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; Depends:</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co">.</span><span class="re">{{{</span><span class="co">date</span><span class="re">}}}</span></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co">.TRTSDT</span></span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt; Outputs:</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">variable</span><span class="re">}}}</span></span></code></pre></div>
+<p>Access individual fields:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>ady<span class="sc">$</span>id</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ady&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>ady<span class="sc">$</span>title</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Analysis relative day&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>ady<span class="sc">$</span>type</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;column&quot;</span></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>ady<span class="sc">$</span>params</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a><span class="co">#&gt;       name                                  description</span></span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a><span class="co">#&gt; 1   domain `character` Name of new domain being created</span></span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a><span class="co">#&gt; 2 variable   `character` Name of new variable to create</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a><span class="co">#&gt; 3     date     `character` Name of date variable to use</span></span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a>ady<span class="sc">$</span>depends</span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="co">#&gt;         domain     column</span></span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt; 1 </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> </span><span class="re">{{{</span><span class="co">date</span><span class="re">}}}</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt; 2 </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co">     TRTSDT</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a>ady<span class="sc">$</span>outputs</span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt; [1] &quot;</span><span class="re">{{{</span><span class="co">variable</span><span class="re">}}}</span><span class="co">&quot;</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a>ady<span class="sc">$</span>origin</span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Derived&quot;</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a>ady<span class="sc">$</span>method</span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Relative day computed from treatment start date&quot;</span></span></code></pre></div>
+</div>
+<div id="render-a-component" class="section level2">
+<h2>Render a component</h2>
+<p>Rendering fills in the placeholders with values.
+<code>$render()</code> takes one named argument per <code>@param</code>
+tag and returns a <code>mighty_component_rendered</code> object. Every
+placeholder is now a name:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>ady_rendered <span class="ot">&lt;-</span> ady<span class="sc">$</span><span class="fu">render</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>, <span class="at">variable =</span> <span class="st">&quot;ASTDY&quot;</span>, <span class="at">date =</span> <span class="st">&quot;ASTDT&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>ady_rendered</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component_rendered/mighty_component/R6&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a><span class="co">#&gt; ady: Analysis relative day</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a><span class="co">#&gt; Type: column</span></span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a><span class="co">#&gt; Depends:</span></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="co">#&gt; • ADAE.ASTDT</span></span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a><span class="co">#&gt; • ADAE.TRTSDT</span></span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a><span class="co">#&gt; Outputs:</span></span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a><span class="co">#&gt; • ASTDY</span></span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a><span class="co">#&gt; Code:</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a><span class="co">#&gt; ADAE &lt;- ADAE |&gt;</span></span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;   dplyr::mutate(</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;     ASTDY = admiral::compute_duration(</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt;       start_date = TRTSDT,</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a><span class="co">#&gt;       end_date = ASTDT,</span></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="co">#&gt;       in_unit = &#39;days&#39;,</span></span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a><span class="co">#&gt;       out_unit = &#39;days&#39;,</span></span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a><span class="co">#&gt;       add_one = TRUE</span></span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a><span class="co">#&gt;     )</span></span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a><span class="co">#&gt;   )</span></span></code></pre></div>
+<p>The rendered code is validated: it must be valid R, and joins must
+specify <code>by</code> (see <a href="#automatic-code-validation">Automatic code validation</a>).
+Columns are not checked. Use <code>get_test_component()</code> (see <a href="#testing-components">Testing components</a>) to run a component on
+real data.</p>
+<p><code>get_rendered_component()</code> retrieves and renders in one
+step. It takes the parameters as a named <code>list</code>:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a><span class="fu">get_rendered_component</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="fu">system.file</span>(<span class="st">&quot;examples&quot;</span>, <span class="st">&quot;ady.mustache&quot;</span>, <span class="at">package =</span> <span class="st">&quot;mighty.component&quot;</span>),</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="fu">list</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>, <span class="at">variable =</span> <span class="st">&quot;ASTDY&quot;</span>, <span class="at">date =</span> <span class="st">&quot;ASTDT&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component_rendered/mighty_component/R6&gt;</span></span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a><span class="co">#&gt; ady: Analysis relative day</span></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="co">#&gt; Type: column</span></span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt; Depends:</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt; • ADAE.ASTDT</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; • ADAE.TRTSDT</span></span>
+<span id="cb7-11"><a href="#cb7-11" tabindex="-1"></a><span class="co">#&gt; Outputs:</span></span>
+<span id="cb7-12"><a href="#cb7-12" tabindex="-1"></a><span class="co">#&gt; • ASTDY</span></span>
+<span id="cb7-13"><a href="#cb7-13" tabindex="-1"></a><span class="co">#&gt; Code:</span></span>
+<span id="cb7-14"><a href="#cb7-14" tabindex="-1"></a><span class="co">#&gt; ADAE &lt;- ADAE |&gt;</span></span>
+<span id="cb7-15"><a href="#cb7-15" tabindex="-1"></a><span class="co">#&gt;   dplyr::mutate(</span></span>
+<span id="cb7-16"><a href="#cb7-16" tabindex="-1"></a><span class="co">#&gt;     ASTDY = admiral::compute_duration(</span></span>
+<span id="cb7-17"><a href="#cb7-17" tabindex="-1"></a><span class="co">#&gt;       start_date = TRTSDT,</span></span>
+<span id="cb7-18"><a href="#cb7-18" tabindex="-1"></a><span class="co">#&gt;       end_date = ASTDT,</span></span>
+<span id="cb7-19"><a href="#cb7-19" tabindex="-1"></a><span class="co">#&gt;       in_unit = &#39;days&#39;,</span></span>
+<span id="cb7-20"><a href="#cb7-20" tabindex="-1"></a><span class="co">#&gt;       out_unit = &#39;days&#39;,</span></span>
+<span id="cb7-21"><a href="#cb7-21" tabindex="-1"></a><span class="co">#&gt;       add_one = TRUE</span></span>
+<span id="cb7-22"><a href="#cb7-22" tabindex="-1"></a><span class="co">#&gt;     )</span></span>
+<span id="cb7-23"><a href="#cb7-23" tabindex="-1"></a><span class="co">#&gt;   )</span></span></code></pre></div>
+<p>A missing parameter raises an error:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>ady<span class="sc">$</span><span class="fu">render</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="co">#&gt; Error in `ms_render()`:</span></span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; ! Parameter names not matching component requirements:</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a><span class="co">#&gt; ✖ `variable` not specified</span></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a><span class="co">#&gt; ✖ `date` not specified</span></span></code></pre></div>
+</div>
+<div id="evaluate-rendered-code" class="section level2">
+<h2>Evaluate rendered code</h2>
+<p><code>$eval()</code> runs the code. By default it runs in the calling
+environment. Use the <code>envir</code> argument to choose another
+environment. The code assigns the result back to the domain (e.g.,
+<code>ADAE &lt;- ADAE |&gt; ...</code>), so <code>ADAE</code> is updated
+without assigning the return value.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>ADAE <span class="ot">&lt;-</span> pharmaverseadam<span class="sc">::</span>adae <span class="sc">|&gt;</span></span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(USUBJID, ASTDT, TRTSDT)</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a><span class="fu">names</span>(ADAE)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;USUBJID&quot; &quot;ASTDT&quot;   &quot;TRTSDT&quot;</span></span></code></pre></div>
+<p><code>ASTDY</code> does not exist yet. Run the rendered
+component:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>ady_rendered<span class="sc">$</span><span class="fu">eval</span>()</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a><span class="fu">names</span>(ADAE)</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;USUBJID&quot; &quot;ASTDT&quot;   &quot;TRTSDT&quot;  &quot;ASTDY&quot;</span></span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a><span class="fu">head</span>(ADAE)</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 4</span></span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a><span class="co">#&gt;   USUBJID     ASTDT      TRTSDT     ASTDY</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;date&gt;     &lt;date&gt;     &lt;dbl&gt;</span></span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="co">#&gt; 1 01-701-1015 2014-01-03 2014-01-02     2</span></span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; 2 01-701-1015 2014-01-03 2014-01-02     2</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; 3 01-701-1015 2014-01-09 2014-01-02     8</span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; 4 01-701-1023 2012-08-07 2012-08-05     3</span></span>
+<span id="cb10-12"><a href="#cb10-12" tabindex="-1"></a><span class="co">#&gt; 5 01-701-1023 2012-08-07 2012-08-05     3</span></span>
+<span id="cb10-13"><a href="#cb10-13" tabindex="-1"></a><span class="co">#&gt; 6 01-701-1023 2012-08-07 2012-08-05     3</span></span></code></pre></div>
+<p><code>$stream()</code> appends the code to an R script instead:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>script_file <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">&quot;.R&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a>ady_rendered<span class="sc">$</span><span class="fu">stream</span>(script_file)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="fu">readLines</span>(script_file)</span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a><span class="co">#&gt;  [1] &quot;ADAE &lt;- ADAE |&gt;&quot;                       </span></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a><span class="co">#&gt;  [2] &quot;  dplyr::mutate(&quot;                      </span></span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="co">#&gt;  [3] &quot;    ASTDY = admiral::compute_duration(&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt;  [4] &quot;      start_date = TRTSDT,&quot;            </span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a><span class="co">#&gt;  [5] &quot;      end_date = ASTDT,&quot;               </span></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="co">#&gt;  [6] &quot;      in_unit = &#39;days&#39;,&quot;               </span></span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt;  [7] &quot;      out_unit = &#39;days&#39;,&quot;              </span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt;  [8] &quot;      add_one = TRUE&quot;                  </span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt;  [9] &quot;    )&quot;                                 </span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a><span class="co">#&gt; [10] &quot;  )&quot;</span></span></code></pre></div>
+</div>
+<div id="writing-a-custom-component" class="section level2">
+<h2>Writing a custom component</h2>
+<p>Write your own components as <code>.mustache</code> files. This
+component derives the ratio of the analysis value to baseline:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a><span class="co">#&#39; @title Ratio to baseline</span></span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a><span class="co">#&#39; @description</span></span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a><span class="co">#&#39; Derives the ratio of the analysis value to the baseline value.</span></span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a><span class="co">#&#39; @param domain `character` Name of the domain</span></span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="co">#&#39; @param variable `character` Name of the new ratio variable</span></span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&#39; @type column</span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&#39; @origin Derived</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&#39; @method Ratio of AVAL to BASE</span></span>
+<span id="cb12-10"><a href="#cb12-10" tabindex="-1"></a><span class="co">#&#39; @depends </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> AVAL</span></span>
+<span id="cb12-11"><a href="#cb12-11" tabindex="-1"></a><span class="co">#&#39; @depends </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> BASE</span></span>
+<span id="cb12-12"><a href="#cb12-12" tabindex="-1"></a><span class="co">#&#39; @outputs </span><span class="re">{{{</span><span class="co">variable</span><span class="re">}}}</span></span>
+<span id="cb12-13"><a href="#cb12-13" tabindex="-1"></a><span class="co">#&#39; @code</span></span>
+<span id="cb12-14"><a href="#cb12-14" tabindex="-1"></a>{{{domain}}} <span class="ot">&lt;-</span> {{{domain}}} <span class="sc">|&gt;</span></span>
+<span id="cb12-15"><a href="#cb12-15" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(</span>
+<span id="cb12-16"><a href="#cb12-16" tabindex="-1"></a>    {{{variable}}} <span class="ot">=</span> dplyr<span class="sc">::</span><span class="fu">if_else</span>(BASE <span class="sc">!=</span> <span class="dv">0</span>, AVAL <span class="sc">/</span> BASE, <span class="cn">NA_real_</span>)</span>
+<span id="cb12-17"><a href="#cb12-17" tabindex="-1"></a>  )</span></code></pre></div>
+<p>Save the template as <code>r2base.mustache</code>. Then load, render
+and run it:</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>r2base <span class="ot">&lt;-</span> <span class="fu">get_component</span>(r2base_file)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a>r2base</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component/R6&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a><span class="co">#&gt; r2base: Ratio to baseline</span></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a><span class="co">#&gt; Type: column</span></span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="co">#&gt; Parameters:</span></span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; • domain: `character` Name of the domain</span></span>
+<span id="cb13-8"><a href="#cb13-8" tabindex="-1"></a><span class="co">#&gt; • variable: `character` Name of the new ratio variable</span></span>
+<span id="cb13-9"><a href="#cb13-9" tabindex="-1"></a><span class="co">#&gt; Depends:</span></span>
+<span id="cb13-10"><a href="#cb13-10" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co">.AVAL</span></span>
+<span id="cb13-11"><a href="#cb13-11" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co">.BASE</span></span>
+<span id="cb13-12"><a href="#cb13-12" tabindex="-1"></a><span class="co">#&gt; Outputs:</span></span>
+<span id="cb13-13"><a href="#cb13-13" tabindex="-1"></a><span class="co">#&gt; • </span><span class="re">{{{</span><span class="co">variable</span><span class="re">}}}</span></span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>r2base_rendered <span class="ot">&lt;-</span> r2base<span class="sc">$</span><span class="fu">render</span>(</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a>  <span class="at">domain =</span> <span class="st">&quot;ADLB&quot;</span>,</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a>  <span class="at">variable =</span> <span class="st">&quot;R2BASE&quot;</span></span>
+<span id="cb14-4"><a href="#cb14-4" tabindex="-1"></a>)</span>
+<span id="cb14-5"><a href="#cb14-5" tabindex="-1"></a>r2base_rendered<span class="sc">$</span>code</span>
+<span id="cb14-6"><a href="#cb14-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ADLB &lt;- ADLB |&gt;&quot;                                              </span></span>
+<span id="cb14-7"><a href="#cb14-7" tabindex="-1"></a><span class="co">#&gt; [2] &quot;  dplyr::mutate(&quot;                                             </span></span>
+<span id="cb14-8"><a href="#cb14-8" tabindex="-1"></a><span class="co">#&gt; [3] &quot;    R2BASE = dplyr::if_else(BASE != 0, AVAL / BASE, NA_real_)&quot;</span></span>
+<span id="cb14-9"><a href="#cb14-9" tabindex="-1"></a><span class="co">#&gt; [4] &quot;  )&quot;</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>ADLB <span class="ot">&lt;-</span> pharmaverseadam<span class="sc">::</span>adlb <span class="sc">|&gt;</span></span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(PARAMCD <span class="sc">==</span> <span class="st">&quot;ALB&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(USUBJID, PARAMCD, AVISIT, AVAL, BASE)</span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a></span>
+<span id="cb15-5"><a href="#cb15-5" tabindex="-1"></a><span class="fu">head</span>(ADLB)</span>
+<span id="cb15-6"><a href="#cb15-6" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 5</span></span>
+<span id="cb15-7"><a href="#cb15-7" tabindex="-1"></a><span class="co">#&gt;   USUBJID     PARAMCD AVISIT                 AVAL  BASE</span></span>
+<span id="cb15-8"><a href="#cb15-8" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;                 &lt;dbl&gt; &lt;dbl&gt;</span></span>
+<span id="cb15-9"><a href="#cb15-9" tabindex="-1"></a><span class="co">#&gt; 1 01-701-1015 ALB     Baseline                 38    38</span></span>
+<span id="cb15-10"><a href="#cb15-10" tabindex="-1"></a><span class="co">#&gt; 2 01-701-1015 ALB     Week 2                   39    38</span></span>
+<span id="cb15-11"><a href="#cb15-11" tabindex="-1"></a><span class="co">#&gt; 3 01-701-1015 ALB     POST-BASELINE MAXIMUM    39    38</span></span>
+<span id="cb15-12"><a href="#cb15-12" tabindex="-1"></a><span class="co">#&gt; 4 01-701-1015 ALB     Week 4                   38    38</span></span>
+<span id="cb15-13"><a href="#cb15-13" tabindex="-1"></a><span class="co">#&gt; 5 01-701-1015 ALB     Week 6                   37    38</span></span>
+<span id="cb15-14"><a href="#cb15-14" tabindex="-1"></a><span class="co">#&gt; 6 01-701-1015 ALB     POST-BASELINE MINIMUM    37    38</span></span>
+<span id="cb15-15"><a href="#cb15-15" tabindex="-1"></a></span>
+<span id="cb15-16"><a href="#cb15-16" tabindex="-1"></a>r2base_rendered<span class="sc">$</span><span class="fu">eval</span>()</span>
+<span id="cb15-17"><a href="#cb15-17" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" tabindex="-1"></a>ADLB <span class="sc">|&gt;</span></span>
+<span id="cb15-19"><a href="#cb15-19" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(USUBJID, PARAMCD, AVISIT, AVAL, BASE, R2BASE) <span class="sc">|&gt;</span></span>
+<span id="cb15-20"><a href="#cb15-20" tabindex="-1"></a>  <span class="fu">head</span>()</span>
+<span id="cb15-21"><a href="#cb15-21" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span id="cb15-22"><a href="#cb15-22" tabindex="-1"></a><span class="co">#&gt;   USUBJID     PARAMCD AVISIT                 AVAL  BASE R2BASE</span></span>
+<span id="cb15-23"><a href="#cb15-23" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;chr&gt;   &lt;chr&gt;                 &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;</span></span>
+<span id="cb15-24"><a href="#cb15-24" tabindex="-1"></a><span class="co">#&gt; 1 01-701-1015 ALB     Baseline                 38    38  1    </span></span>
+<span id="cb15-25"><a href="#cb15-25" tabindex="-1"></a><span class="co">#&gt; 2 01-701-1015 ALB     Week 2                   39    38  1.03 </span></span>
+<span id="cb15-26"><a href="#cb15-26" tabindex="-1"></a><span class="co">#&gt; 3 01-701-1015 ALB     POST-BASELINE MAXIMUM    39    38  1.03 </span></span>
+<span id="cb15-27"><a href="#cb15-27" tabindex="-1"></a><span class="co">#&gt; 4 01-701-1015 ALB     Week 4                   38    38  1    </span></span>
+<span id="cb15-28"><a href="#cb15-28" tabindex="-1"></a><span class="co">#&gt; 5 01-701-1015 ALB     Week 6                   37    38  0.974</span></span>
+<span id="cb15-29"><a href="#cb15-29" tabindex="-1"></a><span class="co">#&gt; 6 01-701-1015 ALB     POST-BASELINE MINIMUM    37    38  0.974</span></span></code></pre></div>
+</div>
+<div id="component-repos" class="section level2">
+<h2>Component repos</h2>
+<p>A component repo is a collection of components.
+<code>get_component()</code>, <code>find_component()</code> and
+<code>list_components()</code> take a <code>repos</code> argument with
+one or more repo specs:</p>
+<ul>
+<li>A local directory, e.g. <code>&quot;inst/components&quot;</code> or
+<code>&quot;local::inst/components&quot;</code>.</li>
+<li>A GitHub repository,
+e.g. <code>&quot;github::owner/repo/subdir@ref&quot;</code>. Requires the gh and
+remotes packages.</li>
+<li>Raw files under a URL,
+e.g. <code>&quot;url::https://example.com/components&quot;</code>. Requires httr2
+(&gt;= 1.2.2).</li>
+</ul>
+<p>A component <code>name</code> is the file
+<code>&lt;name&gt;.mustache</code> or <code>&lt;name&gt;.R</code>,
+either directly in the repo or in a directory
+<code>&lt;name&gt;/</code>. See <code>?mighty_repo</code> for
+details.</p>
+<p>Put the <code>r2base</code> component from above in a team repo,
+together with a modified copy of <code>ady</code>:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>examples <span class="ot">&lt;-</span> <span class="fu">system.file</span>(<span class="st">&quot;examples&quot;</span>, <span class="at">package =</span> <span class="st">&quot;mighty.component&quot;</span>)</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>team_repo <span class="ot">&lt;-</span> <span class="fu">tempfile</span>(<span class="st">&quot;team&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a><span class="fu">dir.create</span>(team_repo)</span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a><span class="fu">invisible</span>(<span class="fu">file.copy</span>(r2base_file, team_repo))</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a>ady_template <span class="ot">&lt;-</span> <span class="fu">readLines</span>(<span class="fu">file.path</span>(examples, <span class="st">&quot;ady.mustache&quot;</span>))</span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>ady_template[[<span class="dv">1</span>]] <span class="ot">&lt;-</span> <span class="st">&quot;#&#39; @title Analysis relative day (team version)&quot;</span></span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a><span class="fu">writeLines</span>(ady_template, <span class="fu">file.path</span>(team_repo, <span class="st">&quot;ady.mustache&quot;</span>))</span></code></pre></div>
+<p>Several repos are searched in order, and the first match wins. Here
+<code>ady</code> is found in the team repo:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" tabindex="-1"></a>repos <span class="ot">&lt;-</span> <span class="fu">c</span>(team_repo, examples)</span>
+<span id="cb17-2"><a href="#cb17-2" tabindex="-1"></a><span class="fu">list_components</span>(repos)</span>
+<span id="cb17-3"><a href="#cb17-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ady&quot;    &quot;r2base&quot;</span></span>
+<span id="cb17-4"><a href="#cb17-4" tabindex="-1"></a><span class="fu">get_component</span>(<span class="st">&quot;ady&quot;</span>, <span class="at">repos =</span> repos)<span class="sc">$</span>title</span>
+<span id="cb17-5"><a href="#cb17-5" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Analysis relative day (team version)&quot;</span></span></code></pre></div>
+<p>Reverse the order to use <code>ady</code> from the examples:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" tabindex="-1"></a><span class="fu">get_component</span>(<span class="st">&quot;ady&quot;</span>, <span class="at">repos =</span> <span class="fu">rev</span>(repos))<span class="sc">$</span>title</span>
+<span id="cb18-2"><a href="#cb18-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;Analysis relative day&quot;</span></span></code></pre></div>
+<p><code>find_component()</code> returns <code>NULL</code> if no repo
+contains the component. <code>get_component()</code> raises an
+error:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" tabindex="-1"></a><span class="fu">is.null</span>(<span class="fu">find_component</span>(<span class="st">&quot;adt&quot;</span>, <span class="at">repos =</span> repos))</span>
+<span id="cb19-2"><a href="#cb19-2" tabindex="-1"></a><span class="co">#&gt; [1] TRUE</span></span>
+<span id="cb19-3"><a href="#cb19-3" tabindex="-1"></a><span class="fu">get_component</span>(<span class="st">&quot;adt&quot;</span>, <span class="at">repos =</span> repos)</span>
+<span id="cb19-4"><a href="#cb19-4" tabindex="-1"></a><span class="co">#&gt; Error in `get_component()`:</span></span>
+<span id="cb19-5"><a href="#cb19-5" tabindex="-1"></a><span class="co">#&gt; ! Component `adt` not found</span></span></code></pre></div>
+<p><code>list_components(as = &quot;tibble&quot;)</code> returns the metadata of
+each component. It requires the tibble and tidyr packages:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" tabindex="-1"></a><span class="fu">list_components</span>(repos, <span class="at">as =</span> <span class="st">&quot;tibble&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb20-2"><a href="#cb20-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(id, title, type, origin)</span>
+<span id="cb20-3"><a href="#cb20-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 2 × 4</span></span>
+<span id="cb20-4"><a href="#cb20-4" tabindex="-1"></a><span class="co">#&gt;   id     title                                type   origin </span></span>
+<span id="cb20-5"><a href="#cb20-5" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;  &lt;chr&gt;                                &lt;chr&gt;  &lt;chr&gt;  </span></span>
+<span id="cb20-6"><a href="#cb20-6" tabindex="-1"></a><span class="co">#&gt; 1 ady    Analysis relative day (team version) column Derived</span></span>
+<span id="cb20-7"><a href="#cb20-7" tabindex="-1"></a><span class="co">#&gt; 2 r2base Ratio to baseline                    column Derived</span></span></code></pre></div>
+<p>A character vector is converted to repos on each call. Use
+<code>mighty_repos()</code> to create the repos once and reuse them.
+GitHub and URL repos need network access:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" tabindex="-1"></a>repos <span class="ot">&lt;-</span> <span class="fu">mighty_repos</span>(<span class="fu">c</span>(</span>
+<span id="cb21-2"><a href="#cb21-2" tabindex="-1"></a>  <span class="st">&quot;github::NovoNordisk-OpenSource/mighty.standards/components@main&quot;</span>,</span>
+<span id="cb21-3"><a href="#cb21-3" tabindex="-1"></a>  <span class="fu">paste0</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" tabindex="-1"></a>    <span class="st">&quot;url::https://raw.githubusercontent.com/&quot;</span>,</span>
+<span id="cb21-5"><a href="#cb21-5" tabindex="-1"></a>    <span class="st">&quot;NovoNordisk-OpenSource/mighty.standards/main/components&quot;</span></span>
+<span id="cb21-6"><a href="#cb21-6" tabindex="-1"></a>  ),</span>
+<span id="cb21-7"><a href="#cb21-7" tabindex="-1"></a>  examples</span>
+<span id="cb21-8"><a href="#cb21-8" tabindex="-1"></a>))</span>
+<span id="cb21-9"><a href="#cb21-9" tabindex="-1"></a><span class="fu">get_component</span>(<span class="st">&quot;dummy&quot;</span>, <span class="at">repos =</span> repos)</span></code></pre></div>
+<p>See <code>?mighty_repo_github</code> and
+<code>?mighty_repo_url</code> for authentication and retries.</p>
+</div>
+<div id="automatic-code-validation" class="section level2">
+<h2>Automatic code validation</h2>
+<p>Rendered code is validated. It must be valid R, and joins from dplyr,
+tidylog and dbplyr must specify <code>by</code>. Implicit joins are a
+common source of bugs when key columns differ between studies.</p>
+<p>This component fails validation:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" tabindex="-1"></a><span class="co">#&#39; @title Bad join example</span></span>
+<span id="cb22-2"><a href="#cb22-2" tabindex="-1"></a><span class="co">#&#39; @description Implicit join that will fail validation.</span></span>
+<span id="cb22-3"><a href="#cb22-3" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb22-4"><a href="#cb22-4" tabindex="-1"></a><span class="co">#&#39; @param domain `character` Name of the domain</span></span>
+<span id="cb22-5"><a href="#cb22-5" tabindex="-1"></a><span class="co">#&#39; @type row</span></span>
+<span id="cb22-6"><a href="#cb22-6" tabindex="-1"></a><span class="co">#&#39; @origin Derived</span></span>
+<span id="cb22-7"><a href="#cb22-7" tabindex="-1"></a><span class="co">#&#39; @method Implicit join on other_data</span></span>
+<span id="cb22-8"><a href="#cb22-8" tabindex="-1"></a><span class="co">#&#39; @depends </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> USUBJID</span></span>
+<span id="cb22-9"><a href="#cb22-9" tabindex="-1"></a><span class="co">#&#39; @outputs MYCOL</span></span>
+<span id="cb22-10"><a href="#cb22-10" tabindex="-1"></a><span class="co">#&#39; @code</span></span>
+<span id="cb22-11"><a href="#cb22-11" tabindex="-1"></a>{{{domain}}} <span class="ot">&lt;-</span> {{{domain}}} <span class="sc">|&gt;</span></span>
+<span id="cb22-12"><a href="#cb22-12" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(other_data)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" tabindex="-1"></a><span class="fu">get_rendered_component</span>(bad_file, <span class="fu">list</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>))</span>
+<span id="cb23-2"><a href="#cb23-2" tabindex="-1"></a><span class="co">#&gt; Error in `abort_validation_errors()`:</span></span>
+<span id="cb23-3"><a href="#cb23-3" tabindex="-1"></a><span class="co">#&gt; ! Component validation failed:</span></span>
+<span id="cb23-4"><a href="#cb23-4" tabindex="-1"></a><span class="co">#&gt; </span></span>
+<span id="cb23-5"><a href="#cb23-5" tabindex="-1"></a><span class="co">#&gt; ! Implicit dplyr join(s) detected in rendered component:</span></span>
+<span id="cb23-6"><a href="#cb23-6" tabindex="-1"></a><span class="co">#&gt; ✖ Join operations must explicitly specify the `by` argument</span></span>
+<span id="cb23-7"><a href="#cb23-7" tabindex="-1"></a><span class="co">#&gt; ℹ Line 2: dplyr::left_join</span></span></code></pre></div>
+<p>Specify the join key with <code>by</code> to fix it:</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" tabindex="-1"></a><span class="co">#&#39; @title Good join example</span></span>
+<span id="cb24-2"><a href="#cb24-2" tabindex="-1"></a><span class="co">#&#39; @description Explicit join that passes validation.</span></span>
+<span id="cb24-3"><a href="#cb24-3" tabindex="-1"></a><span class="co">#&#39;</span></span>
+<span id="cb24-4"><a href="#cb24-4" tabindex="-1"></a><span class="co">#&#39; @param domain `character` Name of the domain</span></span>
+<span id="cb24-5"><a href="#cb24-5" tabindex="-1"></a><span class="co">#&#39; @type row</span></span>
+<span id="cb24-6"><a href="#cb24-6" tabindex="-1"></a><span class="co">#&#39; @origin Derived</span></span>
+<span id="cb24-7"><a href="#cb24-7" tabindex="-1"></a><span class="co">#&#39; @method Explicit join on other_data by USUBJID</span></span>
+<span id="cb24-8"><a href="#cb24-8" tabindex="-1"></a><span class="co">#&#39; @depends </span><span class="re">{{{</span><span class="co">domain</span><span class="re">}}}</span><span class="co"> USUBJID</span></span>
+<span id="cb24-9"><a href="#cb24-9" tabindex="-1"></a><span class="co">#&#39; @outputs MYCOL</span></span>
+<span id="cb24-10"><a href="#cb24-10" tabindex="-1"></a><span class="co">#&#39; @code</span></span>
+<span id="cb24-11"><a href="#cb24-11" tabindex="-1"></a>{{{domain}}} <span class="ot">&lt;-</span> {{{domain}}} <span class="sc">|&gt;</span></span>
+<span id="cb24-12"><a href="#cb24-12" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">left_join</span>(other_data, <span class="at">by =</span> dplyr<span class="sc">::</span><span class="fu">join_by</span>(USUBJID))</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" tabindex="-1"></a><span class="fu">get_rendered_component</span>(good_file, <span class="fu">list</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>))<span class="sc">$</span>code</span>
+<span id="cb25-2"><a href="#cb25-2" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ADAE &lt;- ADAE |&gt;&quot;                                             </span></span>
+<span id="cb25-3"><a href="#cb25-3" tabindex="-1"></a><span class="co">#&gt; [2] &quot;  dplyr::left_join(other_data, by = dplyr::join_by(USUBJID))&quot;</span></span></code></pre></div>
+</div>
+<div id="testing-components" class="section level2">
+<h2>Testing components</h2>
+<p><code>get_test_component()</code> creates a component that runs in a
+separate R session and tracks code coverage. Use it for interactive
+checks and for unit tests with testthat.</p>
+<p>By default (<code>check_coverage = TRUE</code>), coverage is checked
+when the calling environment ends, e.g. the <code>test_that()</code>
+block. An error is raised if any line has not run. This vignette is not
+a test, so it sets <code>check_coverage = FALSE</code>.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" tabindex="-1"></a>ady_path <span class="ot">&lt;-</span> <span class="fu">system.file</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" tabindex="-1"></a>  <span class="st">&quot;examples&quot;</span>, <span class="st">&quot;ady.mustache&quot;</span>,</span>
+<span id="cb26-3"><a href="#cb26-3" tabindex="-1"></a>  <span class="at">package =</span> <span class="st">&quot;mighty.component&quot;</span></span>
+<span id="cb26-4"><a href="#cb26-4" tabindex="-1"></a>)</span>
+<span id="cb26-5"><a href="#cb26-5" tabindex="-1"></a>ady_test <span class="ot">&lt;-</span> <span class="fu">get_test_component</span>(</span>
+<span id="cb26-6"><a href="#cb26-6" tabindex="-1"></a>  <span class="at">component =</span> ady_path,</span>
+<span id="cb26-7"><a href="#cb26-7" tabindex="-1"></a>  <span class="at">params =</span> <span class="fu">list</span>(<span class="at">domain =</span> <span class="st">&quot;ADAE&quot;</span>, <span class="at">variable =</span> <span class="st">&quot;ASTDY&quot;</span>, <span class="at">date =</span> <span class="st">&quot;ASTDT&quot;</span>),</span>
+<span id="cb26-8"><a href="#cb26-8" tabindex="-1"></a>  <span class="at">check_coverage =</span> <span class="cn">FALSE</span> <span class="co"># keep the default TRUE in tests</span></span>
+<span id="cb26-9"><a href="#cb26-9" tabindex="-1"></a>)</span>
+<span id="cb26-10"><a href="#cb26-10" tabindex="-1"></a>ady_test</span>
+<span id="cb26-11"><a href="#cb26-11" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component_test/mighty_component_rendered/mighty_component/R6&gt;</span></span>
+<span id="cb26-12"><a href="#cb26-12" tabindex="-1"></a><span class="co">#&gt; ady: Derives the relative day compared to the treatment start date.</span></span>
+<span id="cb26-13"><a href="#cb26-13" tabindex="-1"></a><span class="co">#&gt; Test Coverage: 0.00%</span></span>
+<span id="cb26-14"><a href="#cb26-14" tabindex="-1"></a><span class="co">#&gt; Code: (✔ Covered, ✖ Uncovered)</span></span>
+<span id="cb26-15"><a href="#cb26-15" tabindex="-1"></a><span class="co">#&gt; ✖ ADAE &lt;- ADAE |&gt;</span></span>
+<span id="cb26-16"><a href="#cb26-16" tabindex="-1"></a><span class="co">#&gt; ✖   dplyr::mutate(</span></span>
+<span id="cb26-17"><a href="#cb26-17" tabindex="-1"></a><span class="co">#&gt; ✖     ASTDY = admiral::compute_duration(</span></span>
+<span id="cb26-18"><a href="#cb26-18" tabindex="-1"></a><span class="co">#&gt; ✖       start_date = TRTSDT,</span></span>
+<span id="cb26-19"><a href="#cb26-19" tabindex="-1"></a><span class="co">#&gt; ✖       end_date = ASTDT,</span></span>
+<span id="cb26-20"><a href="#cb26-20" tabindex="-1"></a><span class="co">#&gt; ✖       in_unit = &#39;days&#39;,</span></span>
+<span id="cb26-21"><a href="#cb26-21" tabindex="-1"></a><span class="co">#&gt; ✖       out_unit = &#39;days&#39;,</span></span>
+<span id="cb26-22"><a href="#cb26-22" tabindex="-1"></a><span class="co">#&gt; ✖       add_one = TRUE</span></span>
+<span id="cb26-23"><a href="#cb26-23" tabindex="-1"></a><span class="co">#&gt; ✖     )</span></span>
+<span id="cb26-24"><a href="#cb26-24" tabindex="-1"></a><span class="co">#&gt; ✖   )</span></span></code></pre></div>
+<p>Assign input data in the test session:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" tabindex="-1"></a>adae_input <span class="ot">&lt;-</span> pharmaverseadam<span class="sc">::</span>adae <span class="sc">|&gt;</span></span>
+<span id="cb27-2"><a href="#cb27-2" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(USUBJID, ASTDT, TRTSDT)</span>
+<span id="cb27-3"><a href="#cb27-3" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" tabindex="-1"></a>ady_test<span class="sc">$</span><span class="fu">assign</span>(<span class="st">&quot;ADAE&quot;</span>, adae_input)</span>
+<span id="cb27-5"><a href="#cb27-5" tabindex="-1"></a>ady_test<span class="sc">$</span><span class="fu">ls</span>()</span>
+<span id="cb27-6"><a href="#cb27-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;ADAE&quot;</span></span></code></pre></div>
+<p>Run the component and get the result:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" tabindex="-1"></a>ady_test<span class="sc">$</span><span class="fu">eval</span>()</span>
+<span id="cb28-2"><a href="#cb28-2" tabindex="-1"></a>ady_test<span class="sc">$</span><span class="fu">get</span>(<span class="st">&quot;ADAE&quot;</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span>
+<span id="cb28-3"><a href="#cb28-3" tabindex="-1"></a><span class="co">#&gt; # A tibble: 6 × 4</span></span>
+<span id="cb28-4"><a href="#cb28-4" tabindex="-1"></a><span class="co">#&gt;   USUBJID     ASTDT      TRTSDT     ASTDY</span></span>
+<span id="cb28-5"><a href="#cb28-5" tabindex="-1"></a><span class="co">#&gt;   &lt;chr&gt;       &lt;date&gt;     &lt;date&gt;     &lt;dbl&gt;</span></span>
+<span id="cb28-6"><a href="#cb28-6" tabindex="-1"></a><span class="co">#&gt; 1 01-701-1015 2014-01-03 2014-01-02     2</span></span>
+<span id="cb28-7"><a href="#cb28-7" tabindex="-1"></a><span class="co">#&gt; 2 01-701-1015 2014-01-03 2014-01-02     2</span></span>
+<span id="cb28-8"><a href="#cb28-8" tabindex="-1"></a><span class="co">#&gt; 3 01-701-1015 2014-01-09 2014-01-02     8</span></span>
+<span id="cb28-9"><a href="#cb28-9" tabindex="-1"></a><span class="co">#&gt; 4 01-701-1023 2012-08-07 2012-08-05     3</span></span>
+<span id="cb28-10"><a href="#cb28-10" tabindex="-1"></a><span class="co">#&gt; 5 01-701-1023 2012-08-07 2012-08-05     3</span></span>
+<span id="cb28-11"><a href="#cb28-11" tabindex="-1"></a><span class="co">#&gt; 6 01-701-1023 2012-08-07 2012-08-05     3</span></span></code></pre></div>
+<p>Every line of the code has now run:</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" tabindex="-1"></a><span class="co"># Print method</span></span>
+<span id="cb29-2"><a href="#cb29-2" tabindex="-1"></a>ady_test</span>
+<span id="cb29-3"><a href="#cb29-3" tabindex="-1"></a><span class="co">#&gt; &lt;mighty_component_test/mighty_component_rendered/mighty_component/R6&gt;</span></span>
+<span id="cb29-4"><a href="#cb29-4" tabindex="-1"></a><span class="co">#&gt; ady: Derives the relative day compared to the treatment start date.</span></span>
+<span id="cb29-5"><a href="#cb29-5" tabindex="-1"></a><span class="co">#&gt; Test Coverage: 100.00%</span></span>
+<span id="cb29-6"><a href="#cb29-6" tabindex="-1"></a><span class="co">#&gt; Code: (✔ Covered, ✖ Uncovered)</span></span>
+<span id="cb29-7"><a href="#cb29-7" tabindex="-1"></a><span class="co">#&gt; ✔ ADAE &lt;- ADAE |&gt;</span></span>
+<span id="cb29-8"><a href="#cb29-8" tabindex="-1"></a><span class="co">#&gt; ✔   dplyr::mutate(</span></span>
+<span id="cb29-9"><a href="#cb29-9" tabindex="-1"></a><span class="co">#&gt; ✔     ASTDY = admiral::compute_duration(</span></span>
+<span id="cb29-10"><a href="#cb29-10" tabindex="-1"></a><span class="co">#&gt; ✔       start_date = TRTSDT,</span></span>
+<span id="cb29-11"><a href="#cb29-11" tabindex="-1"></a><span class="co">#&gt; ✔       end_date = ASTDT,</span></span>
+<span id="cb29-12"><a href="#cb29-12" tabindex="-1"></a><span class="co">#&gt; ✔       in_unit = &#39;days&#39;,</span></span>
+<span id="cb29-13"><a href="#cb29-13" tabindex="-1"></a><span class="co">#&gt; ✔       out_unit = &#39;days&#39;,</span></span>
+<span id="cb29-14"><a href="#cb29-14" tabindex="-1"></a><span class="co">#&gt; ✔       add_one = TRUE</span></span>
+<span id="cb29-15"><a href="#cb29-15" tabindex="-1"></a><span class="co">#&gt; ✔     )</span></span>
+<span id="cb29-16"><a href="#cb29-16" tabindex="-1"></a><span class="co">#&gt; ✔   )</span></span>
+<span id="cb29-17"><a href="#cb29-17" tabindex="-1"></a><span class="co"># Percent coverage</span></span>
+<span id="cb29-18"><a href="#cb29-18" tabindex="-1"></a>ady_test<span class="sc">$</span>percent_coverage</span>
+<span id="cb29-19"><a href="#cb29-19" tabindex="-1"></a><span class="co">#&gt; [1] 100</span></span>
+<span id="cb29-20"><a href="#cb29-20" tabindex="-1"></a><span class="co"># Line coverage as a data.frame</span></span>
+<span id="cb29-21"><a href="#cb29-21" tabindex="-1"></a>ady_test<span class="sc">$</span>line_coverage</span>
+<span id="cb29-22"><a href="#cb29-22" tabindex="-1"></a><span class="co">#&gt;    line value</span></span>
+<span id="cb29-23"><a href="#cb29-23" tabindex="-1"></a><span class="co">#&gt; 1     1     1</span></span>
+<span id="cb29-24"><a href="#cb29-24" tabindex="-1"></a><span class="co">#&gt; 2     2     1</span></span>
+<span id="cb29-25"><a href="#cb29-25" tabindex="-1"></a><span class="co">#&gt; 3     3     1</span></span>
+<span id="cb29-26"><a href="#cb29-26" tabindex="-1"></a><span class="co">#&gt; 4     4     1</span></span>
+<span id="cb29-27"><a href="#cb29-27" tabindex="-1"></a><span class="co">#&gt; 5     5     1</span></span>
+<span id="cb29-28"><a href="#cb29-28" tabindex="-1"></a><span class="co">#&gt; 6     6     1</span></span>
+<span id="cb29-29"><a href="#cb29-29" tabindex="-1"></a><span class="co">#&gt; 7     7     1</span></span>
+<span id="cb29-30"><a href="#cb29-30" tabindex="-1"></a><span class="co">#&gt; 8     8     1</span></span>
+<span id="cb29-31"><a href="#cb29-31" tabindex="-1"></a><span class="co">#&gt; 9     9     1</span></span>
+<span id="cb29-32"><a href="#cb29-32" tabindex="-1"></a><span class="co">#&gt; 10   10     1</span></span></code></pre></div>
+<p>In a testthat file, create the test component inside
+<code>test_that()</code>, assign data, evaluate and test the results.
+Coverage is checked when the test ends. See
+<code>?mighty_component_test</code> for the workflow.</p>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

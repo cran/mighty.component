@@ -1,0 +1,32 @@
+## {{id}}: {{title}}
+*type: {{type}}*
+*origin: {{origin}}*
+*method: {{method}}*
+
+{{description}}
+
+### Parameters
+
+{{#params}}
+{{.}}
+{{/params}}
+
+### Depends
+
+{{#depends}}
+{{.}}
+{{/depends}}
+
+### Outputs
+
+{{#outputs}}
+* {{.}}
+{{/outputs}}
+
+### Code
+
+```r
+{{#code}}
+{{{.}}}
+{{/code}}
+```

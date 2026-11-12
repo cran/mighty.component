@@ -1,0 +1,99 @@
+# mighty_component
+
+    Code
+      test_component
+    Message
+      <mighty_component/R6>
+      test: My test component
+      Type: column
+      Parameters:
+      * domain: `character` Name of new domain being created
+      * x1: First input
+      * x2: Second input
+      Depends:
+      * {{{domain}}}.A
+      * Y.B
+      Outputs:
+      * NEWVAR
+
+---
+
+    Code
+      test_component_rendered
+    Message
+      <mighty_component_rendered/mighty_component/R6>
+      test: My test component
+      Type: column
+      Depends:
+      * domain.A
+      * Y.B
+      Outputs:
+      * NEWVAR
+      Code:
+      domain$NEWVAR <- 1 * Y$B + domain$A - 2
+
+# print
+
+    Code
+      expect_s3_class(expect_invisible(print(get_component(test_path("_components",
+        "test_component.mustache")))), "mighty_component")
+    Message
+      <mighty_component/R6>
+      test_component: My test component
+      Type: column
+      Parameters:
+      * domain: `character` Name of new domain being created
+      * x1: First input
+      * x2: Second input
+      Depends:
+      * {{{domain}}}.A
+      * Y.B
+      Outputs:
+      * NEWVAR
+
+# create_bullets
+
+    Code
+      create_bullets(header = "mytest", bullets = c("first item", "second item"))
+    Message
+      mytest
+      * first item
+      * second item
+
+# document
+
+    Code
+      test_component$document()
+    Message
+      ## test_component: My test component
+      *type: column*
+      *origin: Derived*
+      *method: Some method text*
+      
+      This is a test component used for unit testing
+      
+      ### Parameters
+      
+      |name   |description                                  |
+      |:------|:--------------------------------------------|
+      |domain |`character` Name of new domain being created |
+      |x1     |First input                                  |
+      |x2     |Second input                                 |
+      
+      ### Depends
+      
+      |domain       |column |
+      |:------------|:------|
+      |{{{domain}}} |A      |
+      |Y            |B      |
+      
+      ### Outputs
+      
+      * NEWVAR
+      
+      ### Code
+      
+      ```r
+      {{{domain}}}$NEWVAR <- {{{x1}}} * Y$B + {{{domain}}}$A - {{{x2}}}
+      ```
+

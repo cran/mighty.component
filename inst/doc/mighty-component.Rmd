@@ -1,0 +1,465 @@
+---
+title: "Getting Started with mighty.component"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting Started with mighty.component}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = rlang::is_installed(c(
+    "admiral", "callr", "covr", "dplyr", "pharmaverseadam", "tibble", "tidyr"
+  ))
+)
+withr::local_options(mighty.component.verbosity_level = "quiet")
+```
+
+```{r setup}
+library(mighty.component)
+```
+
+## What is a component?
+
+A component is a reusable code template for one data transformation step. Its
+code takes an input data set and returns it with new or changed columns or
+rows. Mustache placeholders, such as `{{{domain}}}`, are filled in when the
+component is rendered, so the same template works across studies. Roxygen-like
+tags, such as `@title`, `@param` and `@depends`, document what the component
+does, needs and creates.
+
+Components are commonly used to build ADaM (Analysis Data Model) programs. Each
+component handles one derivation, and several components make up a program. In
+the mighty ecosystem, mighty.metadata provides study configuration (via
+[`mighty_study()`](https://novonordisk-opensource.github.io/mighty.metadata/reference/mighty_study.html)
+and `_study.yml`) that controls which components are rendered and with which
+parameters.
+
+## Anatomy of a component template
+
+Below is a minimal component that creates a column as two times an existing
+column:
+
+```r
+#' @title Double a column
+#' @description
+#' Creates a new column as two times an existing column.
+#'
+#' @param domain `character` Name of the domain
+#' @param output `character` Name of the new column
+#' @param input `character` Name of the existing column
+#' @type column
+#' @origin Derived
+#' @method Two times the input column
+#' @depends {{{domain}}} {{{input}}}
+#' @outputs {{{output}}}
+#' @code
+{{{domain}}} <- {{{domain}}} |>
+  dplyr::mutate(
+    {{{output}}} = 2 * {{{input}}}
+  )
+```
+
+The template syntax is described below.
+
+```{r child = "../man/rmd/template-reference.Rmd"}
+```
+
+See `?mighty_component` for validation rules and a rendered example.
+
+## Retrieve and inspect a component
+
+List the example components shipped with the package:
+
+```{r list-components}
+path <- system.file("examples", package = "mighty.component")
+list_components(path)
+```
+
+Retrieve one by file path:
+
+```{r get-ady}
+ady <- get_component(
+  system.file("examples", "ady.mustache", package = "mighty.component")
+)
+ady
+```
+
+Access individual fields:
+
+```{r inspect-fields}
+ady$id
+ady$title
+ady$type
+ady$params
+ady$depends
+ady$outputs
+ady$origin
+ady$method
+```
+
+## Render a component
+
+Rendering fills in the placeholders with values. `$render()` takes one named
+argument per `@param` tag and returns a `mighty_component_rendered` object.
+Every placeholder is now a name:
+
+```{r render-ady}
+ady_rendered <- ady$render(domain = "ADAE", variable = "ASTDY", date = "ASTDT")
+ady_rendered
+```
+
+The rendered code is validated: it must be valid R, and joins must specify
+`by` (see [Automatic code validation]). Columns are not checked. Use
+`get_test_component()` (see [Testing components]) to run a component on real
+data.
+
+`get_rendered_component()` retrieves and renders in one step. It takes the
+parameters as a named `list`:
+
+```{r shortcut}
+get_rendered_component(
+  system.file("examples", "ady.mustache", package = "mighty.component"),
+  list(domain = "ADAE", variable = "ASTDY", date = "ASTDT")
+)
+```
+
+A missing parameter raises an error:
+
+```{r render-error, error=TRUE}
+ady$render(domain = "ADAE")
+```
+
+## Evaluate rendered code
+
+`$eval()` runs the code. By default it runs in the calling environment. Use the
+`envir` argument to choose another environment. The code assigns the result
+back to the domain (e.g., `ADAE <- ADAE |> ...`), so `ADAE` is updated without
+assigning the return value.
+
+```{r eval-setup}
+ADAE <- pharmaverseadam::adae |>
+  dplyr::select(USUBJID, ASTDT, TRTSDT)
+
+names(ADAE)
+```
+
+`ASTDY` does not exist yet. Run the rendered component:
+
+```{r eval-run}
+ady_rendered$eval()
+names(ADAE)
+head(ADAE)
+```
+
+`$stream()` appends the code to an R script instead:
+
+```{r stream-example}
+script_file <- tempfile(fileext = ".R")
+ady_rendered$stream(script_file)
+readLines(script_file)
+```
+
+## Writing a custom component
+
+Write your own components as `.mustache` files. This component derives the
+ratio of the analysis value to baseline:
+
+```r
+#' @title Ratio to baseline
+#' @description
+#' Derives the ratio of the analysis value to the baseline value.
+#'
+#' @param domain `character` Name of the domain
+#' @param variable `character` Name of the new ratio variable
+#' @type column
+#' @origin Derived
+#' @method Ratio of AVAL to BASE
+#' @depends {{{domain}}} AVAL
+#' @depends {{{domain}}} BASE
+#' @outputs {{{variable}}}
+#' @code
+{{{domain}}} <- {{{domain}}} |>
+  dplyr::mutate(
+    {{{variable}}} = dplyr::if_else(BASE != 0, AVAL / BASE, NA_real_)
+  )
+```
+
+```{r custom-write, include = FALSE}
+r2base_file <- file.path(withr::local_tempdir(), "r2base.mustache")
+writeLines(c(
+  "#' @title Ratio to baseline",
+  "#' @description",
+  "#' Derives the ratio of the analysis value to the baseline value.",
+  "#'",
+  "#' @param domain `character` Name of the domain",
+  "#' @param variable `character` Name of the new ratio variable",
+  "#' @type column",
+  "#' @origin Derived",
+  "#' @method Ratio of AVAL to BASE",
+  "#' @depends {{{domain}}} AVAL",
+  "#' @depends {{{domain}}} BASE",
+  "#' @outputs {{{variable}}}",
+  "#' @code",
+  "{{{domain}}} <- {{{domain}}} |>",
+  "  dplyr::mutate(",
+  "    {{{variable}}} = dplyr::if_else(BASE != 0, AVAL / BASE, NA_real_)",
+  "  )"
+), r2base_file)
+```
+
+Save the template as `r2base.mustache`. Then load, render and run it:
+
+```{r custom-load}
+r2base <- get_component(r2base_file)
+r2base
+```
+
+```{r custom-render}
+r2base_rendered <- r2base$render(
+  domain = "ADLB",
+  variable = "R2BASE"
+)
+r2base_rendered$code
+```
+
+```{r custom-eval}
+ADLB <- pharmaverseadam::adlb |>
+  dplyr::filter(PARAMCD == "ALB") |>
+  dplyr::select(USUBJID, PARAMCD, AVISIT, AVAL, BASE)
+
+head(ADLB)
+
+r2base_rendered$eval()
+
+ADLB |>
+  dplyr::select(USUBJID, PARAMCD, AVISIT, AVAL, BASE, R2BASE) |>
+  head()
+```
+
+## Component repos
+
+A component repo is a collection of components. `get_component()`,
+`find_component()` and `list_components()` take a `repos` argument with one or
+more repo specs:
+
+- A local directory, e.g. `"inst/components"` or `"local::inst/components"`.
+- A GitHub repository, e.g. `"github::owner/repo/subdir@ref"`. Requires the gh
+  and remotes packages.
+- Raw files under a URL, e.g. `"url::https://example.com/components"`.
+  Requires httr2 (>= 1.2.2).
+
+A component `name` is the file `<name>.mustache` or `<name>.R`, either directly
+in the repo or in a directory `<name>/`. See `?mighty_repo` for details.
+
+Put the `r2base` component from above in a team repo, together with a modified
+copy of `ady`:
+
+```{r repos-setup}
+examples <- system.file("examples", package = "mighty.component")
+team_repo <- tempfile("team")
+dir.create(team_repo)
+invisible(file.copy(r2base_file, team_repo))
+
+ady_template <- readLines(file.path(examples, "ady.mustache"))
+ady_template[[1]] <- "#' @title Analysis relative day (team version)"
+writeLines(ady_template, file.path(team_repo, "ady.mustache"))
+```
+
+Several repos are searched in order, and the first match wins. Here `ady` is
+found in the team repo:
+
+```{r repos-priority}
+repos <- c(team_repo, examples)
+list_components(repos)
+get_component("ady", repos = repos)$title
+```
+
+Reverse the order to use `ady` from the examples:
+
+```{r repos-reverse}
+get_component("ady", repos = rev(repos))$title
+```
+
+`find_component()` returns `NULL` if no repo contains the component.
+`get_component()` raises an error:
+
+```{r repos-not-found, error = TRUE}
+is.null(find_component("adt", repos = repos))
+get_component("adt", repos = repos)
+```
+
+`list_components(as = "tibble")` returns the metadata of each component.
+It requires the tibble and tidyr packages:
+
+```{r repos-tibble}
+list_components(repos, as = "tibble") |>
+  dplyr::select(id, title, type, origin)
+```
+
+A character vector is converted to repos on each call. Use `mighty_repos()` to
+create the repos once and reuse them. GitHub and URL repos need network access:
+
+```{r repos-github, eval = FALSE}
+repos <- mighty_repos(c(
+  "github::NovoNordisk-OpenSource/mighty.standards/components@main",
+  paste0(
+    "url::https://raw.githubusercontent.com/",
+    "NovoNordisk-OpenSource/mighty.standards/main/components"
+  ),
+  examples
+))
+get_component("dummy", repos = repos)
+```
+
+See `?mighty_repo_github` and `?mighty_repo_url` for authentication and
+retries.
+
+## Automatic code validation
+
+Rendered code is validated. It must be valid R, and joins from dplyr, tidylog
+and dbplyr must specify `by`. Implicit joins are a common source of bugs when
+key columns differ between studies.
+
+This component fails validation:
+
+```r
+#' @title Bad join example
+#' @description Implicit join that will fail validation.
+#'
+#' @param domain `character` Name of the domain
+#' @type row
+#' @origin Derived
+#' @method Implicit join on other_data
+#' @depends {{{domain}}} USUBJID
+#' @outputs MYCOL
+#' @code
+{{{domain}}} <- {{{domain}}} |>
+  dplyr::left_join(other_data)
+```
+
+```{r validation-fail-setup, include = FALSE}
+bad_template <- c(
+  "#' @title Bad join example",
+  "#' @description Implicit join that will fail validation.",
+  "#'",
+  "#' @param domain `character` Name of the domain",
+  "#' @type row",
+  "#' @origin Derived",
+  "#' @method Implicit join on other_data",
+  "#' @depends {{{domain}}} USUBJID",
+  "#' @outputs MYCOL",
+  "#' @code",
+  "{{{domain}}} <- {{{domain}}} |>",
+  "  dplyr::left_join(other_data)"
+)
+
+bad_file <- withr::local_tempfile(fileext = ".mustache", lines = bad_template)
+```
+
+```{r validation-fail, error=TRUE}
+get_rendered_component(bad_file, list(domain = "ADAE"))
+```
+
+Specify the join key with `by` to fix it:
+
+```r
+#' @title Good join example
+#' @description Explicit join that passes validation.
+#'
+#' @param domain `character` Name of the domain
+#' @type row
+#' @origin Derived
+#' @method Explicit join on other_data by USUBJID
+#' @depends {{{domain}}} USUBJID
+#' @outputs MYCOL
+#' @code
+{{{domain}}} <- {{{domain}}} |>
+  dplyr::left_join(other_data, by = dplyr::join_by(USUBJID))
+```
+
+```{r validation-pass-setup, include = FALSE}
+good_template <- c(
+  "#' @title Good join example",
+  "#' @description Explicit join that passes validation.",
+  "#'",
+  "#' @param domain `character` Name of the domain",
+  "#' @type row",
+  "#' @origin Derived",
+  "#' @method Explicit join on other_data by USUBJID",
+  "#' @depends {{{domain}}} USUBJID",
+  "#' @outputs MYCOL",
+  "#' @code",
+  "{{{domain}}} <- {{{domain}}} |>",
+  "  dplyr::left_join(other_data, by = dplyr::join_by(USUBJID))"
+)
+
+good_file <- withr::local_tempfile(fileext = ".mustache", lines = good_template)
+```
+
+```{r validation-pass}
+get_rendered_component(good_file, list(domain = "ADAE"))$code
+```
+
+## Testing components
+
+`get_test_component()` creates a component that runs in a separate R session
+and tracks code coverage. Use it for interactive checks and for unit tests with
+testthat.
+
+By default (`check_coverage = TRUE`), coverage is checked when the calling
+environment ends, e.g. the `test_that()` block. An error is raised if any line
+has not run. This vignette is not a test, so it sets `check_coverage = FALSE`.
+
+```{r test-create}
+ady_path <- system.file(
+  "examples", "ady.mustache",
+  package = "mighty.component"
+)
+ady_test <- get_test_component(
+  component = ady_path,
+  params = list(domain = "ADAE", variable = "ASTDY", date = "ASTDT"),
+  check_coverage = FALSE # keep the default TRUE in tests
+)
+ady_test
+```
+
+Assign input data in the test session:
+
+```{r test-assign}
+adae_input <- pharmaverseadam::adae |>
+  dplyr::select(USUBJID, ASTDT, TRTSDT)
+
+ady_test$assign("ADAE", adae_input)
+ady_test$ls()
+```
+
+Run the component and get the result:
+
+```{r test-eval}
+ady_test$eval()
+ady_test$get("ADAE") |> head()
+```
+
+Every line of the code has now run:
+
+```{r test-coverage}
+# Print method
+ady_test
+# Percent coverage
+ady_test$percent_coverage
+# Line coverage as a data.frame
+ady_test$line_coverage
+```
+
+In a testthat file, create the test component inside `test_that()`, assign
+data, evaluate and test the results. Coverage is checked when the test ends.
+See `?mighty_component_test` for the workflow.
+
+```{r cleanup, include = FALSE}
+ady_test$close()
+unlink(c(script_file, team_repo), recursive = TRUE)
+```
